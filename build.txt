@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  pre_build:
+    # Log in to ECR, and get an ECR Loging Token.  Since we have a connection after this point, we will be able to Push the Docker image
+    # to ECR at a Later Point. 
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 653470767467.dkr.ecr.us-east-1.amazonaws.com
+  build:
+    # Build the Docker Image from Dockerfile.
+    # Once the Image has been built, the image tag needs to be updated to specify the Remote ECR Repository Name.
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...          
+      - docker build -t docker .
+      - docker tag docker:latest 653470767467.dkr.ecr.us-east-1.amazonaws.com/docker:latest
+  post_build:
+    commands:
+      - echo build Docker image complete `date`
+      - echo push latest Docker images to ECR...
+      - docker push 653470767467.dkr.ecr.us-east-1.amazonaws.com/docker:latest
+       
